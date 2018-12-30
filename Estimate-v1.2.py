@@ -1,13 +1,16 @@
-#oven = 45
-#heavy_duty = 50
 #fan = 5
-#deep cleaning = 2 * regular_price
-#movein_moveout =
+#######
+#Notes#
+#######
+#Consider moving inputs into the constructor itself that way each time a new instance is constructed they will be called and saved.
+#Consider adding separate object class Name for runAnother program.
+#Consider adding options for weekly, biweekly, monthly, onetime (frequency); and pets Y/N for each question that needs it.
+
 ###################################################################
 #Our user inputs to input into initalize an instance of an object.#
 ###################################################################
 
-#Consider moving inputs into the constructor itself that way each time a new instance is constructed they will be called and saved.
+
 full_cost = 0
 brnumber = input("How many bedrooms?")
 bathnumber = input("How many bathrooms?")
@@ -15,7 +18,6 @@ sqftnumber = input("Sqft of your house?")
 pets = input("Do you have pets? Y for Yes, N for no.")
 frequency = input("How frequent will you be needing services?")
 kitchen = input("Will you be needing your kitchen cleaned? Y for Yes, N for No.")
-#specialCleaning = input("Please input any special cleaning needs, if none, enter N or n.")
 
 
 
@@ -24,7 +26,6 @@ kitchen = input("Will you be needing your kitchen cleaned? Y for Yes, N for No."
 ###################################
 class Estimate:
     def __init__(self, brnumber, bathnumber, kitchen, sqftnumber, pets, frequency, full_cost):
-
         self.brnumber = int(brnumber)
         self.bathnumber = float(bathnumber)
         self.kitchen = str(kitchen)
@@ -32,7 +33,6 @@ class Estimate:
         self.pets = str(pets)
         self.frequency = frequency
         self.full_cost = full_cost
-        #self.specialCleaning = specialCleaning
 
 ###############################
 #Method creation for estimate##
@@ -67,37 +67,53 @@ class Estimate:
         if extraServices == "Y" or extraServices == "y":
             print("Running extra services!")
             object.extraServicesfunct()
+        specialCleaning = input("Please input any special cleaning needs, if none, enter N or n.")
+        if specialCleaning == "y" or specialCleaning == "Y":
+            object.specialServicesfunct()
         object.full_cost += total_cost
         return "Your estimate will be between: " + "$" + str(object.full_cost - 10) + " - " + "$" + str(object.full_cost + 10)
 
 
-    def extraServicesfunct(object):
+    def extraServicesfunct(self):
         total_cost_ext = 0
-        print("Extra Function Called!")
         interior_windows = input("Would you like your interior windows cleaned?")
-        blinds = input("Would you like your blinds cleaned?")
-        fridge = input("Would you like your fridge cleaned?")
-        oven = input("Would you like your oven cleaned?")
         if interior_windows == "Y" or interior_windows == "y":
             how_many_windows = int(input("How many windows do you have?"))
             total_cost_ext += 7.5 * how_many_windows
+        fridge = input("Would you like your fridge cleaned?")
         if fridge == "Y" or fridge == "y":
             total_cost_ext += 35
+        oven = input("Would you like your oven cleaned?")
         if oven == "Y" or oven == "y":
             total_cost_ext += 45
+        blinds = input("Would you like your blinds cleaned?")
         if blinds == "Y" or blinds == "y":
             total_cost_ext += 30
-        object.full_cost += total_cost_ext
+        self.full_cost += total_cost_ext
         return "The total cost of your extra cleaning is: $" + str(total_cost_ext)
 
+    def specialServicesfunct(self):
+        specialCleaningCost = 0
+        print("Please choose from the following:\n Heavy Duty \n Deep Cleaning \n Type MIMO for Move-in Move-out \n Post Construction \n Commercial")
+        whichSpecialService = input("Which special service will you be needing?")
+        if whichSpecialService == "heavy duty" or whichSpecialService == "Heavy Duty":
+            specialCleaningCost += 50
+        if whichSpecialService == "Deep Cleaning" or whichSpecialService == "deep cleaning":
+            self.full_cost = self.full_cost
+        if whichSpecialService == "MIMO" or whichSpecialService == "mimo":
+            return "Must do an in-person estimate."
+        if whichSpecialService == "PC" or whichSpecialService == "pc":
+            return print("Must do an in-person estimate.")
+        self.full_cost += specialCleaningCost
+        return print("The total cost of your special cleaning is: $" + str(specialCleaningCost))
 
 ####################################
 #Object creation and function call.#
 ####################################
 Person1Estimate = Estimate(brnumber, bathnumber, kitchen, sqftnumber, pets, frequency, full_cost)
 print(Person1Estimate.estimate())
-#print("The total cost of your servicing with the standard and extra services will be: $" + str(Person1Estimate.full_cost))
+print("The total cost of your servicing with the standard and extra services will be: $" + str(Person1Estimate.full_cost))
 runAnother = input("Would you like to run another estimate?")
 print(runAnother)
 if runAnother == "Y" or "y":
-    print(estimate(Person2))
+    print(Estimate(Person2))
