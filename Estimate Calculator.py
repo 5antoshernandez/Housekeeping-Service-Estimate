@@ -28,6 +28,7 @@
 
 #deep cleaning = 2 * regular_price
 #movein_moveout =
+full_cost = 0
 brnumber = input("How many bedrooms?")
 bathnumber = input("How many bathrooms?")
 sqftnumber = input("Sqft of your house?")
@@ -42,14 +43,15 @@ fridge = input("Would you like your fridge cleaned?")
 oven = input("Would you like your oven cleaned?")
 
 class Estimate:
-    def __init__(self, brnumber, bathnumber, kitchen, regService, sqftnumber, pets, frequency):
+    def __init__(self, brnumber, bathnumber, kitchen, regService, sqftnumber, pets, frequency, full_cost = 0):
         self.brnumber = int(brnumber)
-        self.bathnumber = int(bathnumber)
+        self.bathnumber = float(bathnumber)
         self.kitchen = str(kitchen)
         self.regService = str(regService)
         self.sqftnumber = int(sqftnumber)
         self.pets = str(pets)
         self.frequency = frequency
+        self.full_cost = 0
 class xtraServices:
     def __init__(self, interior_windows, fridge, oven, blinds):
         self.interior_windows = interior_windows
@@ -81,25 +83,28 @@ def estimate(object):
    ### adding cost of pets
     if object.pets == "Y" or "y":
         total_cost += 25
-    if object.extraServices == "Y" or "y":
-        extraServicesfunct(object)
-    return ("Your estimate will be between:", total_cost - 10, "-", total_cost + 10)
-def extraServicesfunct(object)
-    total_cost = 0
+    object.full_cost += total_cost
+    return "Your estimate will be between: " + "$" + str(object.full_cost - 10) + " - " + "$" + str(object.full_cost + 10)
+def extraServicesfunct(object):
+    total_cost_ext = 0
     if object.interior_windows == "Y" or "y":
-        total_cost += 7.5
+        how_many_windows = input("How many windows do you have?")
+        print(how_many_windows)
+        total_cost_ext += 7.5 * int(how_many_windows)
     if object.fridge == "Y" or "y":
-        total_cost += 35
+        total_cost_ext += 35
     if object.oven == "Y" or "y":
-        total_cost += 45
-    if object.blinds == "Y" or "y"
-        total_cost += 30
-    return total_cost
-#Person1Estimate = Estimate(brnumber, bathnumber, kitchen, regService, sqftnumber, pets, frequency)
-Person1ExtraServices = xtraServices(interior_windows, fridge, oven, blinds)
-#print(estimate(Person1Estimate))
+        total_cost_ext += 45
+    if object.blinds == "Y" or "y":
+        total_cost_ext += 30
+    Person1Estimate.full_cost += object.total_cost_ext
+    return "The total cost of your extra cleaning is: $" + str(Person1Estimate.total_cost_ext)
+Person1Estimate =  Estimate(brnumber, bathnumber, kitchen, regService, sqftnumber, pets, frequency, full_cost)
+#Person1ExtraServices = xtraServices(interior_windows, fridge, oven, blinds)
+print(estimate(Person1Estimate))
 #print(extraServicesfunct(Person1ExtraServices))
-#runAnother = input("Would you like to run another estimate?")
-#print(runAnother)
-#if runAnother == "Y" or "y":
-    #print(estimate(Person2))
+print("The total cost of your servicing with the standard and extra services will be: $" + str(Person1Estimate.full_cost))
+runAnother = input("Would you like to run another estimate?")
+print(runAnother)
+if runAnother == "Y" or "y":
+    print(estimate(Person2))
