@@ -3,4 +3,4 @@ Hello! My wife owns a housekeeping services business and she had the problem of 
 
 Now instead of spending money on vehicle maintenance, gas, their hourly wages (wife and her mom), this tool saves them thousands every year and is a great sales tool to agree on a range before committing to going out in-person or scheduling right then and there.
 
-P.S Please ignore the weird file adds and version control I manually did. I am new to git and this was my first repository in which I pushed/pulled/committed and updated the files. I have since stopped doing this weird manual stuff and use my terminal now.
+P.S Please ignore the weird file adds and version control I manually did. I am new to git and this was my first repository in which I pushed/pulled/committed and updated the files. I have since stopped doing this weird manual stuff and use my terminal now and commits for version control.
