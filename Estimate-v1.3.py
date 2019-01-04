@@ -2,9 +2,6 @@
 #######
 #Notes#
 #######
-#Consider moving inputs into the constructor itself that way each time a new instance is constructed they will be called and saved.
-#Consider adding separate object class Name for runAnother program.
-#Consider adding options for weekly, biweekly, monthly, onetime (frequency); and pets Y/N for each question that needs it.
 
 ###################################
 #Object code#######################
@@ -44,9 +41,11 @@ class Estimate:
             total_cost += 30
 
         #Additional options considered by each household.
-        if self.sqftnumber > 500:
+        if self.sqftnumber > 2000:
+            total_cost = (self.sqftnumber * .05)
+        elif self.sqftnumber > 500:
             total_cost = (self.sqftnumber - 500) * .07
-        if self.kitchen == "Y" or self.kitchen == "Y" "y":
+        if self.kitchen == "Y" or self.kitchen == "y":
             total_cost += 25
         if self.pets == "Y" or self.pets == "y":
             total_cost += 25
@@ -60,7 +59,7 @@ class Estimate:
         if specialCleaning == "y" or specialCleaning == "Y":
             self.specialServicesfunct()
         self.full_cost += total_cost
-        return "Your estimate will be between: " + "$" + str(self.full_cost - 10) + " - " + "$" + str(self.full_cost + 10)
+        return "Your estimate will be between: " + "$" + str(round(self.full_cost - 10, 2)) + " - " + "$" + str(round(self.full_cost + 10, 2))
 
 
     def extraServicesfunct(self):
@@ -83,8 +82,7 @@ class Estimate:
 
     def specialServicesfunct(self):
         specialCleaningCost = 0
-        print("Please choose from the following:\n Heavy Duty \n Deep Cleaning \n Type MIMO for Move-in Move-out \n Post Construction \n Commercial")
-        whichSpecialService = input("Which special service will you be needing?")
+        whichSpecialService = input("Which special service will you be needing? \n Please choose from the following:\n Heavy Duty \n Deep Cleaning \n MIMO for Move-in Move-out \n PC for Post Construction \n Commercial")
         if whichSpecialService == "heavy duty" or whichSpecialService == "Heavy Duty":
             specialCleaningCost += 50
         if whichSpecialService == "Deep Cleaning" or whichSpecialService == "deep cleaning":
@@ -93,6 +91,8 @@ class Estimate:
             return "Must do an in-person estimate."
         if whichSpecialService == "PC" or whichSpecialService == "pc":
             return print("Must do an in-person estimate.")
+        if whichSpecialService == "Comm" or whichSpecialService =="comm":
+            return "Must do in-person estimate."
         self.full_cost += specialCleaningCost
         return print("The total cost of your special cleaning is: $" + str(specialCleaningCost))
 
