@@ -5,7 +5,7 @@ curr = conn.cursor()
 #######
 #Notes#
 #######
-#Going to add SQL support for storage.
+#Consider adding a billing table with a date, time, & fee with servicing as well.
 #0 = False/No, 1 = True/Yes
 #Special Services
 ####0 = Heavy Duty
@@ -22,12 +22,12 @@ class Name:
         self.firstname = firstname
         self.lastname = lastname
         self.fullname = self.firstname + " " + self.lastname
+        #Initializes a Row in Clients Table.
         curr.execute('INSERT OR IGNORE INTO Clients (name) VALUES (?)', ( self.fullname, ))
         conn.commit()
 class Estimate:
     def __init__(self, nameCreation):
         self.name = nameCreation.fullname
-        print(self.name)
         self.address = input("What's the house's address?")
         self.brnumber = int(input("How many bedrooms?"))
         self.bathnumber = float(input("How many bathrooms?"))
@@ -37,13 +37,24 @@ class Estimate:
         self.frequency = input("How frequent will you be needing services?\n Please enter one of the following: \n weekly \n biweekly \n monthly \n onetime")
         curr.execute('SELECT id FROM Clients WHERE name = ?', (nameCreation.fullname,))
         self.client_id = curr.fetchone()[0]
-        curr.execute('''INSERT INTO House (address, bedrooms, bathrooms, sqft
-            , pets, client_id) VALUES (?, ?, ?, ?, ?, ?)''', (self.address, self.brnumber, self.bathnumber, self.sqftnumber, self.pets, self.client_id))
+        #This either initializes the House table or Updates it if the address is already on file.
+        try:
+            curr.execute('''INSERT INTO House (address, bedrooms, bathrooms, sqft, pets, client_id) VALUES (?, ?, ?, ?, ?, ?)''', (self.address, self.brnumber, self.bathnumber, self.sqftnumber, self.pets, self.client_id))
+        except:
+            curr.execute('''UPDATE House SET address = ?, bedrooms = ?, bathrooms = ?, sqft = ?, pets = ? WHERE client_id = ?''', (self.address, self.brnumber, self.bathnumber, self.sqftnumber, self.pets, self.client_id))
         conn.commit()
-        print(type(self.client_id))
         curr.execute('SELECT id FROM House WHERE client_id = ?', (self.client_id, ))
         self.house_id = curr.fetchone()[0]
         print(self.house_id)
+        try:
+            curr.execute('INSERT OR IGNORE INTO Clients house_id = ? WHERE name = ?', (self.house_id, self.name))
+            conn.commit()
+        except:
+            curr.execute('''UPDATE Clients SET house_id = ? WHERE name = ?''', (self.house_id, self.name))
+            conn.commit()
+        #Updates the row of a particular house that the client is associated with.
+        #May want to consider changing the WHERE clause to address instead of client_id.
+        curr.execute('''UPDATE House SET kitchen = ?, frequency = ? WHERE client_id = ?''', (self.kitchen, self.frequency, self.client_id))
         conn.commit()
         self.full_cost = 0
 
@@ -86,10 +97,10 @@ class Estimate:
         if specialCleaning == "y" or specialCleaning == "Y":
             self.specialServicesfunct()
         self.full_cost += total_cost
-        try:
-            curr.execute('INSERT INTO Clients (service_fee) VALUES (?) WHERE name = ?', (total_cost, self.name))
-        except:
-            curr.execute('UPDATE Clients SET (service_fee) = ? WHERE name = ?', (total_cost, self.name))
+        #Updating the Fee in a particular House table.
+        #May want to update by address in case the client is associated with
+        #Multiple properties.
+        curr.execute('UPDATE House SET (fee) = ? WHERE client_id = ?', (self.full_cost, self.client_id))
         conn.commit()
         return "Your estimate will be between: " + "$" + str(round(self.full_cost - 10, 2)) + " - " + "$" + str(round(self.full_cost + 10, 2))
 
@@ -110,13 +121,9 @@ class Estimate:
         if blinds == "Y" or blinds == "y":
             total_cost_ext += 30
         self.full_cost += total_cost_ext
-        ####NEED TO FIX THIS EXECUTE STUFF
-        try:
-            curr.execute('''INSERT INTO Services (extra_services, client_id, house_id, int_windows, fridge, oven, blinds) VALUES (?, ?, ?, ?, ?, ?, ?) WHERE name = ?''', ("Y", self.client_id, self.house_id, interior_windows, fridge, oven, blinds, self.name))
-            conn.commit()
-        except:
-            curr.execute('''UPDATE Services SET (extra_services, client_id, house_id, int_windows, fridge, oven, blinds) VALUES (?, ?, ?, ?, ?, ?, ?) WHERE name = ?''', ("Y", self.client_id, self.house_id, interior_windows, fridge, oven, blinds, self.name))
-            conn.commit()
+        #Updates the Row with extra services data if requested.
+        curr.execute('''UPDATE House SET extra_services = ?, int_windows = ?, fridge = ?, oven = ?, blinds =? WHERE address = ?''', ("Y", interior_windows, fridge, oven, blinds, self.address))
+        conn.commit()
         return "The total cost of your extra cleaning is: $" + str(total_cost_ext)
 
     def specialServicesfunct(self):
@@ -127,7 +134,7 @@ class Estimate:
             specialCleaningCost += 50
             specialCleaningDBVar = 0
         if whichSpecialService == "Deep Cleaning" or whichSpecialService == "deep cleaning":
-            self.full_cost = self.full_cost
+            specialCleaningCost = self.full_cost
             specialCleaningDBVar = 1
         if whichSpecialService == "MIMO" or whichSpecialService == "mimo":
             specialCleaningDBVar = 2
@@ -139,8 +146,8 @@ class Estimate:
             specialCleaningDBVar = 4
             return "Must do in-person estimate."
         self.full_cost += specialCleaningCost
-        ##NEED TO FIX THIS TOO.
-        curr.execute('INSERT INTO OR UPDATE Services (special_services) VALUES (?) WHERE name = ?', (specialCleaningDBVar, self.name))
+        #Updates the partciular row with special services data.
+        curr.execute('UPDATE House SET special_services = ? WHERE client_id = ?', (specialCleaningDBVar, self.client_id))
         conn.commit()
         return print("The total cost of your special cleaning is: $" + str(specialCleaningCost))
 
@@ -153,7 +160,6 @@ def createEstimate():
     nameCreation= Name(firstname, lastname)
     estimateCreation = Estimate(nameCreation)
     print(estimateCreation.estimate())
-
     runAnother = input("Would you like to run another estimate?")
     if runAnother == "Y" or runAnother == "y":
         createEstimate()
